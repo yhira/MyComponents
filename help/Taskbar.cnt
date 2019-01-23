@@ -1,0 +1,87 @@
+:Base Taskbar.hlp>main
+:Title TTrayIcon コンポーネントリファレンス
+:Index TTrayIcon コンポーネントリファレンス =Taskbar.hlp
+1 はじめに =HLP000001
+1 インストールとアンインストール =HLP000085
+1 TTrayIcon コンポーネント
+2 リファレンス =HLP000009
+2 Infomation
+3 マルチラインツールチップについて =HLP000020
+3 バルーンヘルプについて =HLP000019
+3 マウスイベントについて =HLP000026
+2 型
+3 TBalloonIconType 型 =HLP000016
+2 プロパティ
+3 AutoPopup =HLP000014
+3 BalloonHelpIcon =HLP000015
+3 BalloonHelpText =HLP000021
+3 BalloonHelpTimeOut =HLP000022
+3 BalloonHelpTitle =HLP000023
+3 CanBalloonHelp =HLP000024
+3 CheckSingleDoubleClick =HLP000025
+3 DoForegroundWindow =HLP000027
+3 HideOnTaskBar =HLP000028
+3 Icon =HLP000029
+3 Interval =HLP000030
+3 LButtonPopupMenu =HLP000068
+3 Minimized =HLP000031
+3 ResIcon =HLP000032
+3 ResourceIconID =HLP000033
+3 ResourceIconList =HLP000034
+3 TipHelp =HLP000035
+3 ToolTipStyle =HLP000083
+3 Visible =HLP000036
+2 メソッド
+3 CallbackWndProc =HLP000060
+3 Create =HLP000037
+3 Destroy =HLP000038
+3 DeleteTrayIcon =HLP000065
+3 GetTaskTrayHWND =HLP000039
+3 HideBalloonHelp =HLP000066
+3 Notification =HLP000067
+3 SetTrayIcon =HLP000088
+3 ShowBalloonHelp =HLP000089
+3 ShowBalloonHelpSE =HLP000090
+2 イベント
+3 OnDblClick =HLP000041
+3 OnIconAnimation =HLP000043
+3 OnMouseClick =HLP000056
+3 OnMouseDown =HLP000044
+3 OnMouseEnter =HLP000045
+3 OnMouseExit =HLP000057
+3 OnMouseMove =HLP000059
+3 OnMouseUp =HLP000058
+3 OnRDblClick =HLP000091
+3 OnRestartTaskbar =HLP000093
+1 その他機能
+2 定数 =HLP000077
+2 リソースファイルの作り方 =HLP000075
+2 GetShellDllVersion =HLP000079
+2 GetFileVersion =HLP000080
+2 TCustomToolTipStyle
+3 リファレンス =HLP000048
+3 プロパティ
+4 BackGroundColor =HLP000054
+4 TextColor =HLP000055
+4 UseDefault =HLP000053
+2 TMouseEventMaker
+3 リファレンス =HLP000064
+2 TTaskTrayIcon
+3 リファレンス =HLP000062
+3 プロパティ
+4 Icon =HLP000074
+4 OnTaskTray =HLP000076
+4 IconRegisted =HLP000092
+4 Shell32Version =HLP000078
+4 ShellNewVersion =HLP000081
+4 ToolTipStyle =HLP000082
+4 TrayHandle =HLP000084
+2 TToolTipStyle
+3 リファレンス =HLP000051
+1 About...
+2 制作・著作・使用許諾 =HLP000069
+2 サポート =HLP000070
+2 ありがとうございます =HLP000071
+2 既知の不具合・課題・他 =HLP000086
+2 改訂履歴 =HLP000011
+

@@ -1,0 +1,572 @@
+==============================================================================
+【 名　　称 】IniFileCompo
+【バージョン】Version 2.2
+【　対応OS　】Windows XP/2000/98
+【 対応言語 】Borland Delphi 7
+【 著作権者 】みず
+【 開発言語 】Borland Delphi 7 professional
+【テスト環境】WindowsXP Home + Delphi 7 professional
+【 配布ﾌｧｲﾙ 】IniFileCompo202.lzh
+【 種　　別 】フリーソフトウェア、Delphiコンポーネント
+【 転載条件 】作者にメールで連絡
+==============================================================================
+
+【１.概要 】
+    ソフトウェアのオプション設定などを保持するとき、INIファイルを使用すること 
+    があります。INIファイルへアクセスするには、TIniFileやTMemIniFileオブジェク
+　　トを使用しますが、アクセスのたびにオブジェクトの生成/破棄を行うのは面倒で
+　　す。そこでコンポーネントにし、INIファイルへのアクセスを楽に行えるようにし
+　　ました。
+
+【２.特長 】
+    各種メソッドによって、いろいろな型のデータを格納できます。特に、フォントな
+　　どTIniFileでは工夫しないと格納できないデータ型を、メソッド１回呼び出すだけ
+　　で格納/呼び出しできます。
+    また、INIファイルへのアクセスは TMemIniFile オブジェクトを使用し、INIファ 
+    イルの内容をメモリにキャッシュしているので高速です。
+
+【３.注意事項】
+    このコンポーネントは Delphi 5 以前のバージョンでは動作しません。
+
+【４.前バージョンからの主な変更点 】
+　　●ReadFont、WriteFontメソッドで、フォントのPixelsPerInchプロパティは保存、
+　　　読み取りしないように変更した。
+
+【５.ファイル構成 】
+    このコンポーネントは以下のファイルで構成しています。
+　　●アーカイブに含まれるファイル
+        IniFileCompo.pas    コンポーネントのソースファイル
+        IniFileCompo.dcr    パレット用のビットマップを含むリソース
+        IniFileCompo.txt    テキストファイル(このファイル)
+
+【６.インストール 】
+    ファイルを解凍後、コンポーネントのインストール方法に従って、
+    IniFileCompo.pasをインストールします。
+    すでに旧バージョンをお使いの場合、旧バージョンのファイルを新ファイルで上書
+    きした後、パッケージ(*.dpk)を開いてコンパイルしてください。
+
+【７.アンインストール 】
+　　Delphiのマニュアルにしたがって、アンインストールします。
+　　Delphi7の場合、「パッケージのインストール」から削除を選びます。
+
+【８.使用方法】
+　　非ビジュアルコンポーネントです。フォームに貼り付けて使用します。
+    DefaultFolderプロパティとFileNameプロパティを設定し、アクセス用のメソッド 
+    を使用してデータの読み書きを行います。
+
+【９.プロパティ】
+　　(RW: 読み出し専用　実: 実行時のみ)(*: 後述)
+    説明のないものはDelphiのヘルプを参照してください。
+　　==========================================================================
+　　■ 独自プロパティ
+　　--------------------------------------------------------------------------
+　　プロパティ　 　型               RW実  説明
+　　AutoUpdate     Boolean          －－　*破棄直前に自動保存するか
+    CaseSensitive  Boolean          －－  *英字の大文字小文字を区別するか
+    DefaultFolder  TDefaultFolder   －－  *INIファイルのフォルダ
+    FileName       string           －－  *INIファイル名
+　　FullName       string           ■■　*フルパスのINIファイル名
+    UpdateAtOnce   Boolean          －－  *すぐにファイルを更新するか
+    ==========================================================================
+　　■ 継承プロパティ
+　　--------------------------------------------------------------------------
+　　プロパティ　 　型               RW実  説明
+    Name           －               －－  コンポーネント名
+    Tag            －               －－  －
+　　==========================================================================
+
+　● AutoUpdate プロパティ
+　　[定義]　property AutoUpdate: Boolean;
+　　[説明]　コンポーネントを破棄する直前、メモリのキャッシュを自動的にディスク
+　　　　　　へ書き込むかどうかを示します。デフォルトはTreuで、コンポーネントが
+　　　　　　破棄されるとき、キャッシュをディスクへ書き込みます。
+　　　　　　Falseに設定すると、自動的にディスクへ書き込まなくなります。この場
+　　　　　　合、アプリケーションでUpdateメソッドを呼び出して、ディスクへの書き
+　　　　　　込みを行う必要があります。ただし、UpdateAtOnceプロパティをTrueにし
+　　　　　　ていれば、Updateメソッドの呼び出しは必要ありません。
+
+　● CaseSensitive プロパティ
+　　[定義]　property CaseSensitive: Boolean;
+　　[説明]　INIファイルのセクション名、及びアイテム名で大文字と小文字を区別す
+　　　　　　るかどうかを示します。Trueの場合、大文字小文字が区別されます。不用
+　　　　　　意にCaseSensitiveプロパティをTrueにすると、データを読み込めなくな
+　　　　　　ることになります。通常はFalseで使用してください。デフォルトは
+　　　　　　Falseです。
+
+　● DefaultFolder プロパティ
+　　[定義]　property DefaultFolder: TDefaultFolder;
+　　[ 型 ]　TDefaultFolder = 
+　　　　　　　　    (dfAppData, dfApplication, dfUser, dfWindows);
+　　[説明]　INIファイルのフォルダを指定します。DefaultFolderに指定できる値は次
+　　　　　　のとおりです。
+　　　　　　　　dfAppData     : アプリケーション定義データ格納用のフォルダ
+    　　　　　　dfApplication : アプリケーションの実行ファイル(*.exe)と同じ
+　　　　　　　　　　　　　　　　フォルダ(デフォルト)
+　　　　　　　　dfUser        : ユーザが指定したフォルダ
+　　　　　　　　dfWindows     : Windowsフォルダ
+　　　　　　dfUserを指定した場合、FileNameプロパティはフルパスで指定する必要が
+　　　　　　あります。その他の場合、FileNameにはパスを除いたファイル名だけを指
+　　　　　　定します。
+
+  ● FileName プロパティ
+　　[定義]　property FileName: string;
+　　[説明]　INIファイル名を指定します。DefaultFolderプロパティがdfUserの場合、
+　　　　　　ファイル名はフルパスで指定します。DefaultFolderプロパティが
+　　　　　　dfApplication、dfWindows、またはdfAppDataの場合、パスを除いたファ
+　　　　　　イル名を指定します。FileNameプロパティを指定しなかった(ヌル)場合、
+　　　　　　INIファイル名はアプリケーションの実行ファイル名と同じになります。
+　　　　　　デフォルトはヌルなので、アプリケーションの実行ファイル名がINIファ
+　　　　　　イル名に使用されます。
+
+　● FullName プロパティ                [実行時のみ、読み取り専用]
+　　[定義]　property FullName: string;
+　　[説明]　INIファイルのパス付きファイル名を取得します。FullNameは実際のINI　
+　　　　　　ファイルの場所を取得できます。DefaultFolderプロパティがdfUserの場
+　　　　　　合、FullNameプロパティとFileNameプロパティは同じものになります。
+　　　　　　DefaultFolderがそれ以外の場合、FullNameは実際のパスを示します。
+　　　　　　FullNameプロパティは読み込み専用です。INIファイルの名前やパスを変
+　　　　　　更するには、FileNameプロパティやDefaultFolderプロパティを設定しま
+　　　　　　す。
+
+  ● UpdateAtOnce プロパティ
+　　[定義]　property UpdateAtOnce: Boolean;
+    [説明]　INIファイルへのアクセスはすべてメモリに対して行われ、アプリケー
+　　　　　　ションの終了時か、Updateメソッドを実行したときにディスクへ書き込み
+　　　　　　ますUpdateAtOnceプロパティをTrueにすると、メモリに書き込まれたデー
+　　　　　　タが直ちにディスクへ書き込まれるようになります。確実にディスクへ
+　　　　　　データを書き込みたいときはUpdateAtOnceプロパティをTrueに設定してく
+　　　　　　ださい。ただし、頻繁にデータを書き込むときはアクセス速度が遅くなっ
+　　　　　　てしまいます。UpdateAtOnceプロパティのデフォルトはFalseです。
+　　==========================================================================
+
+【10.主なメソッド 】
+　　(種　●:procedure　　○:function)(*: 後述)
+　　--------------------------------------------------------------------------
+    名前　　           種  戻り値の型　   内容
+    Clear              ●  －             *INIファイルの内容をすべて消去する
+    Copy               ●  －             *INIファイルをコピーする
+    Create             ○  TIniFileCompo  TIniFileCompoオブジェクトを生成する
+    DeleteItem         ●  －             *指定したアイテムを削除する
+    Destroy            ●  －             －
+    DoUpdate           ●  －             *OnUpdateイベントを発生させる
+    EraseSection       ●  －             *セクションを消去する
+    ItemExists         ○  Boolean        *アイテムが存在するか調べる
+    ReadBool           ○  Boolean        *論理型(Boolean)のデータを読み込む
+　　ReadCardinal       ○  Cardinal       *Cardinal型のデータを読み取る
+    ReadColor          ○  TColor         *TColor型のデータを読み込む
+    ReadCurr           ○  Currency       *Currency型のデータを読み込む
+　　ReadDate           ○  TDate          *TDate型のデータを取り込む
+    ReadDateTime       ○  TDateTime      *TDateTime型のデータを読み込む
+    ReadFloat          ○  Extended       *実数型のデータを読み込む
+    ReadFont           ●  －             *TFont型(フォント)を読み込む
+    ReadForm           ●  －             *フォームの位置やサイズを読み込む
+　　ReadFormEx         ●  －             *フォームの位置やサイズを読み込む
+    ReadInt            ○  Integer        *整数型のデータを読み込む
+    ReadInt64          ○  Int64          *Int64型のデータを読み込む
+    ReadList           ●  －             *文字列リスト(TStrings)を読み込む
+　　ReadPos            ●　－             *コントロールの位置を読み取る
+　　ReadRect           ○　TRect          *TRect型のデータを読み取る
+    ReadSection        ●  －             *アイテムリストを読み込む
+    ReadSectionName    ●  －             *セクション名のリストを読み込む
+　　ReadSize           ●　－             *コントロールのサイズを読み取る
+    ReadSizePos        ●  －             *TControlの位置とサイズを読み込む
+    ReadStr            ○  string         *文字列を読み込む
+    ReadStrWithDecode  ○  string         *暗号化した文字列を読み込む
+　　ReadTime           ○  TTime          *TTime型のデータを読み取る
+    ReadWinPos         ●  －             *フォームの位置を読み込む
+    ReadWinSize        ●  －             *フォームのサイズを読み込む
+　　ReadWinSizeEx      ●  －             *フォームのサイズを読み込む
+    Reload             ●  －             *INIファイルを再読み込みする
+    Rename             ●  －             *INIファイル名を変更する
+    SectionExists      ○  Boolean        *セクションが存在するか調べる
+    Update             ●  －             *キャッシュをディスクに書き込む
+    WriteBool          ●  －             *論理型(Boolean)のデータを書き込む
+　　WriteCardinal      ●　－             *Cardinal型の数値を書き込む
+    WriteColor         ●  －             *TColor型のデータを書き込む
+    WriteCurr          ●  －             *Currency型のデータを書き込む
+　　WriteDate          ●　－             *TDate型のデータを書き込む
+    WriteDateTime      ●  －             *TDateTime型のデータを書き込む
+    WriteFloat         ●  －             *実数型のデータを書き込む
+    WriteFont          ●  －             *TFont型(フォント)を書き込む
+    WriteForm          ●  －             *フォームの位置やサイズを書き込む
+    WriteInt           ●  －             *整数型のデータを書き込む
+    WriteInt64         ●  －             *Int64型のデータを書き込む
+    WriteList          ●  －             *文字列リスト(TStrings)を書き込む
+　　WriteRect          ●　－             *TRect型のデータを書き込む
+    WriteSizePos       ●  －             *TControlの位置とサイズを書き込む
+    WriteStr           ●  －             *文字列を書き込む
+    WriteStrWithEncode ●  －             *文字列を暗号化して書き込む
+　　WriteTime          ●　－             *TTime型の時刻データを書き込む
+　　--------------------------------------------------------------------------
+
+  ● Clear メソッド
+　　[定義]　procedure Clear(const FileUpdate: Boolean);
+　　[説明]　INIファイルの内容を消去します。内容が消去されるだけで、ファイル自
+　　　　　　体は削除されません。FileUpdateにTrueを指定すると、空の内容を直ちに
+　　　　　　ディスクへ書き込みます。FileUpdateがFalseの場合、消去されるのはメ
+　　　　　　モリのキャッシュだけで、ディスクへは反映されません。Clearメソッド
+　　　　　　はUpdateAtOnceプロパティの設定に関係なく、引数によって直ちにディス
+　　　　　　クへ書き込むかどうかが決まります。
+
+  ● Copy メソッド
+　　[定義]　procedure Copy(const IniFileName: string);
+　　[説明]　INIファイルをコピーします。コピー先のINIファイル名は引数
+　　　　　　IniFileNameで指定します。IniFileNameにはINIファイル名をフルパスで
+　　　　　　指定します。
+
+　● DeleteItem メソッド
+　　[定義]　procedure DeleteItem(const Section, Item: string);
+　　[説明]　SectionのセクションからItemで指定したアイテムを消去します。指定し
+　　　　　　たアイテムが存在しなくてもエラーにはなりません。
+
+  ● EraseSection メソッド
+　　[定義]  procedure EraseSection(const Section: string);
+　　[説明]  Sectionに指定したセクションと、そのセクションに含まれるアイテムを
+　　　　　　消去します。指定したセクションが存在しなくてもエラーにはなりません。
+
+  ○ ItemExists メソッド
+    [定義]  function ItemExists(const Section, Item: string): Boolean;
+　　[説明]  Sectionで指定したセクションに、Itemで指定したアイテムが存在するか
+　　　　　　どうかを調べます。アイテムが存在する場合、Trueを返します。
+
+  ○ ReadBool メソッド
+    [定義]  function ReadBool(const Section, Item: string;
+                              Default: Boolean): Boolean;
+    [説明]  INIファイルから論理型のデータを読み込みます。引数SectionとItemで、
+　　　　　　読み込むデータのセクションとアイテムを指定します。指定したセクショ
+　　　　　　ンやアイテムが存在しない場合、Defaultで指定した値を返します。
+
+　○ ReadCardinal メソッド
+　　[定義]　function ReadCardinal(const Section, Item: string;
+　　　　　　                      const Default: Cardinal): Cardinal;
+　　[説明]　Cardinal型のデータをINIファイルから読み取ります。
+
+  ○ ReadColor メソッド
+    [定義]  function ReadColor(const Section, Item: string;
+                               Default: TColor): TColor;
+    [説明]  色を表すデータ(TColor)をINIファイルから読み込みます。
+
+　○ ReadCurr メソッド
+    [定義]  function ReadCurr(const Section, Item: string;
+                              Default: Currency): Currency;
+    [説明]  Currency型のデータをINIファイルから読み込みます。
+
+　○ ReadDate メソッド
+　　[定義]　function ReadDate(const Section, Item: string;
+　　　　　　                  const Default: TDate): TDate;
+　　[説明]　TDate型のデータをINIファイルから読み取ります。
+
+  ○ ReadDateTime メソッド
+    [定義]  function ReadDateTime(const Section, Item: string;
+                                  Default: TDateTime): TDateTime;
+    [説明]  TDateTime型のデータをINIファイルから読み込みます。
+
+  ○ ReadFloat メソッド
+    [定義]  function ReadFloat(const Section, Item: string;
+                               Default: Extended): Extended;
+    [説明]  実数型(Extended)のデータをINIファイルから読み込みます。
+
+  ● ReadFont メソッド
+    [定義]  procedure ReadFont(const Section, Item: string; Font: TFont);
+    [説明]  TFont型のフォントをINIファイルから読み込み、引数Fontに設定します。
+
+  ● ReadForm メソッド
+    [定義]  procedure ReadForm(const Section, Item: string; Form: TForm);
+    [説明]  WriteFormメソッドで書き込んだフォームの位置やサイズを読み込みます。
+
+　● ReadFormEx メソッド
+　　[定義]  procedure ReadFormEx(const Section, Item: string; Form: TForm);
+　　[説明]  WriteFormメソッドで書き込んだフォームの位置とサイズを読み出します。
+　　　　　　ReadFormメソッドとの違いはフォームのクライアントサイズを読み出すこ
+　　　　　　とです。ダイアログなどサイズ変更できないフォームの場合、Windowsの
+　　　　　　画面デザインによってタイトルバーの高さが変化し、クライアント領域の
+　　　　　　一部が表示されなくなるなどの不具合を防止するときに使用します。
+
+  ○ ReadInt メソッド
+    [定義]  function ReadInt(const Section, Item: string;
+                             Default: Integer): Integer;
+    [説明]  整数型のデータをINIファイルから読み込みます。
+
+  ○ ReadInt64 メソッド
+    [定義]  function ReadInt64(const Section, Item: string;
+                               Default: Int64): Int64;
+    [説明]  Int64型の整数値をINIファイルから読み込みます。
+
+  ● ReadList メソッド
+    [定義]  procedure ReadList(const Section, Item: string;
+                               List: TStrings);
+    [説明]  TStrings型の文字列リストをINIファイルから読み込み、引数Listに設定
+　　　　　　します。メソッドを実行すると、一度Listはクリアされますので注意して
+　　　　　　ください。
+
+　● ReadPos メソッド
+　　[定義]　procedure ReadPos(const Section, Item: string; Control: TControl);
+　　[説明]　WriteSizePosメソッドによって記録したコントロールの位置を読み取り、
+　　　　　　Controlに設定します。
+
+　○ ReadRect メソッド
+　　[定義]  function ReadRect(const Section, Item: string;
+　　　　　　                  Default: TRect): TRect;
+　　[説明]　TRect型の値をINIファイルから読み込みます。引数Defaultにはデフォル
+　　　　　　ト値を指定し、INIファイルに指定のデータが存在しなかった場合、
+　　　　　　Defaultが戻り値になります。指定のデータが存在する場合、読み取った
+　　　　　　データが戻り値になります。
+
+  ● ReadSection メソッド
+    [定義]  procedure ReadSection(const Section: string; List: TStrings);
+    [説明]  Sectionに指定したセクションから、<アイテム>=<データ>という書式のア
+　　　　　　イテムのリストを取得し、Listに設定します。
+
+  ● ReadSectionName メソッド
+    [定義]  procedure ReadSectionName(List: TStrings);
+    [説明]  INIファイルに存在する、すべてのセクションの名前を取得し、Listに格
+　　　　　　納します。
+
+　● ReadSize メソッド
+　　[定義]　procedure ReadSize(const Section, Item: string; Control: TControl);
+　　[説明]　WriteSizePosメソッドで記録したコントロールのサイズを読み取り、
+　　　　　　Controlに設定します。
+
+　● ReadSizePos メソッド
+　　[定義]  procedure ReadSizePos(const Section, Item: string;
+　　　　                          Control: TControl);
+　　[説明]  引数Controlに指定したTControl、及びその派生クラスのオブジェクトの
+　　　　　　位置とサイズを読み込みます。位置とサイズの書き込みには、
+　　　　　　WriteSizePosメソッドを使用します。
+
+  ○ ReadStr メソッド
+    [定義]  function ReadStr(const Section, Item, Default: string): string;
+    [説明]  文字列をINIファイルから読み込みます。
+
+　○ ReadStrWithDecode メソッド
+　　[定義]  function ReadStrWithDecode(const Section, Item,
+　　　　                               Password, Default: string): string;
+　　[説明]  WriteStrWithEncodeメソッドで暗号化して書き込んだ文字列を、復元して
+　　　　　　読み込みます。Passwordには書き込み時と同じパスワードを指定します。
+　　　　　　不正なパスワードを指定した場合、不正な文字列を取得します。
+　　　　　　SectionとItemに指定したアイテムが存在しない場合、Defaultの値を返し
+　　　　　　ます。Defaultには暗号化していない文字列を指定します。
+
+　○ ReadTime メソッド
+　　[定義]　function ReadTime(const Section, Item: string;
+　　　　　　                  const Default: TTime): TTime;
+　　[説明]　INIファイルから時刻を表すTTime型のデータを読み取ります。
+
+  ● ReadWinPos メソッド
+    [定義]  procedure ReadWinPos(const Section, Item: string; Form: TForm);
+    [説明]  WriteFormメソッドで書き込んだフォームの位置を、INIファイルから読み
+　　　　　　出し、Formに設定します。このメソッドを実行すると、FormのLeftプロパ
+　　　　　　ティ、及びTopプロパティを読み出せます。
+
+  ● ReadWinSize メソッド
+    [定義]  procedure ReadWinSize(const Section, Item: string;
+                                  Form: TForm);
+    [説明]  WriteFormメソッドで書き込んだフォームのサイズを、INIファイルから読
+　　　　　　み出し、Formに設定します。このメソッドを実行すると、FormのWidthプ
+　　　　　　ロパティ、及びHeightプロパティを読み出せます。
+
+　● ReadWinSizeEx メソッド
+　　[定義]  procedure ReadWinSizeEx(const Section, Item: string;
+　　　　　　                        Form: TForm);
+　　[説明]  WriteFormメソッドで書き込んだフォームのクライアントサイズを、
+　　　　　　INIファイルから読み取り、Formに設定します。このメソッドはフォーム
+　　　　　　のClientWidthプロパティ、及びClientHeightプロパティを読み出します。
+
+  ● Reload メソッド
+    [定義]  procedure Reload;
+　　[説明]　メモリに記憶されているINIファイルの内容を破棄し、ディスクから再読
+　　　　　　み込みします。このとき、ディスクへ書き込んでいないキャッシュの内容
+　　　　　　は失われます。Reloadメソッドを実行すると、OnLoadイベントが発生しま
+　　　　　　す。
+
+  ● Rename メソッド
+    [定義]  procedure Rename(const NewFileName: string);
+    [説明]  INIファイル名を変更します。NewFileNameには変更後の新しい名前を指定
+　　　　　　します。NewFileNameにパス付きのファイル名を指定すると、
+　　　　　　DefaultFolderプロパティがdfUserに設定され、FileNameプロパティがパ
+　　　　　　ス付きのファイル名に変更されます。
+　　　　　　パスなしのファイル名を指定すると、FileNameプロパティだけが変更され
+　　　　　　ます。また、Renameメソッドを実行すると、キャッシュの内容が新しい
+　　　　　　INIファイルに書き込まれ、OnUpdateイベントが発生します。
+
+  ○ SectionExists メソッド
+    [定義]  function SectionExists(const Section: string): Boolean;
+    [説明]  Sectionに指定したセクションが存在するかどうかを調べます。セクショ
+　　　　　　ンが存在する場合True、存在しない場合Falseを返します。
+
+  ● Update メソッド
+    [定義]  procedure Update;
+　　[説明]　メモリにキャッシュされているINIファイルのデータを、ディスクに書き
+　　　　　　込みます。UpdateAtOnceプロパティがTrueの場合、データを書き込むとす
+　　　　　　ぐにディスクへ書き込むため、Updateメソッドを実行する必要がありませ
+　　　　　　ん。
+　　　　　　AutoUpdateプロパティがTrueの場合、コンポーネントが破棄される直前に
+　　　　　　キャッシュがディスクに書き込まれます。AutoUpdateとUpdateAtOnceプロ
+　　　　　　パティのどちらもFalseに設定している場合、アプリケーションから
+　　　　　　Updateメソッドを実行する必要があります。
+
+  ● WriteBool メソッド
+    [定義]  procedure WriteBool(const Section, Item: string; 
+                                Value: Boolean);
+    [説明]  Valueに指定した論理型(Boolean)のデータを、INIファイルに書き込みま
+　　　　　　す。
+
+　● WriteCardinal メソッド
+　　[定義]　procedure WriteCardinal(const Section, Item: string;
+　　　　　　                        const Value: Cardinal);
+　　[説明]　Cardinal型の数値をINIファイルに書き込みます。
+
+  ● WriteColor メソッド
+    [定義]  procedure WriteColor(const Section, Item: string; 
+                                 Value: TColor);
+    [説明]  TColor型のデータをINIファイルに書き込みます。
+
+  ● WriteCurr メソッド
+    [定義]  procedure WriteCurr(const Section, Item: string;
+                                Value: Currency);
+    [説明]  Currency型のデータをINIファイルに書き込みます。
+
+　● WriteDate メソッド
+　　[定義]　procedure WriteDate(const Section, Item: string;
+　　　　　　                    const Value: TDate);
+　　[説明]　TDate型のデータをINIファイルに書き込みます。
+
+  ● WriteDateTime メソッド
+    [定義]  procedure WriteDateTime(const Section, Item: string;
+                                    Value: TDateTime);
+    [説明]  TDateTime型のデータをINIファイルに書き込みます。
+
+  ● WriteFloat メソッド
+    [定義]  procedure WriteFloat(const Section, Item: string;
+                                 Value: Extended);
+    [説明]  実数型のデータをINIファイルに書き込みます。
+
+  ● WriteFont メソッド
+    [定義]  procedure WriteFont(const Section, Item: string; Font: TFont);
+    [説明]  TFont型のフォントをINIファイルに書き込みます。
+
+  ● WriteForm メソッド
+    [定義]  procedure WriteForm(const Section, Item: string; Form: TForm);
+    [説明]  フォームの位置とサイズをINIファイルに記録します。アプリケーション
+　　　　　　終了時にフォームの位置やサイズを記録し、次回起動時にフォーム位置な
+　　　　　　どを復元するときに使用します。
+　　　　　　WriteFormメソッドで記録したデータを読み取る場合、ReadForm、
+　　　　　　ReadFormEx、ReadWinPos、ReadWinSize、ReadWinSizeExのいずれかのメ　
+　　　　　　ソッドを使用すると、簡単にフォームの位置やサイズを復元できます。
+
+  ● WriteInt メソッド
+    [定義]  procedure WriteInt(const Section, Item: string; Value: Integer);
+    [説明]  整数型のデータをINIファイルに書き込みます。Int64型の整数を書き込む
+　　　　　　場合、WriteInt64メソッドを使用してください。
+
+  ● WriteInt64 メソッド
+    [定義]  procedure WriteInt64(const Section, Item: string; Value: Int64);
+    [説明]  Int64型の整数をINIファイルに書き込みます。
+
+  ● WriteList メソッド
+    [定義]  procedure WriteList(const Section, Item: string; 
+　　　　                        List: TStrings);
+    [説明]  TStrings型の文字列リストをINIファイルに書き込みます。
+
+　● WriteRect メソッド
+　　[定義]  procedure WriteRect(const Section, Item: string; Value: TRect);
+　　[説明]　引数Valueで指定したTRect型のデータを、INIファイルに書き込みます。
+
+　● WriteSizePos メソッド
+　　[定義]  procedure WriteSizePos(const Section, Item: string;
+　　　　                           Control: TControl);
+　　[説明]  引数Controlで指定したTControl、またはその下位クラスオブジェクトの
+　　　　　　Left、Top、Width、HeightプロパティをINIファイルに書き込みます。書
+　　　　　　き込んだ位置とサイズを読み込むには、ReadSizePos、ReadSize、
+　　　　　　ReadPosメソッドを使用します。
+
+  ● WriteStr メソッド
+    [定義]  procedure WriteStr(const Section, Item, Value: string);
+    [説明]  文字列をINIファイルに書き込みます。
+
+　● WriteStrWithEncode メソッド
+　　[定義]  procedure WriteStrWithEncode(const Section, Item, Password,
+　　　　                                 Value: string);
+　　[説明]  文字列を暗号化して書き込みます。引数Passwordには暗号化するためのパ
+　　　　　　スワードを指定します。暗号化した文字列の読み込みには、
+　　　　　　ReadStrWithDecodeメソッドを使用します。また、読み込むときには書き
+　　　　　　込み時と同じパスワードを指定する必要があります。暗号化は簡易的なも
+　　　　　　のです。ソースプログラムを公開しているため、プログラムの知識があれ
+　　　　　　ば解読は難しくないということを念頭に置いていてください。
+
+　● WriteTime メソッド
+　　[定義]　procedure WriteTime(const Section, Item: string;
+　　　　　　                    const Value: TTime);
+　　[説明]　時刻を表すTTime型のデータをINIファイルに書き込みます。
+
+
+【11.イベント 】
+　　(* 後述)
+　　--------------------------------------------------------------------------
+　　名前　　　　　      発生条件
+　　OnLoad              *ディスクからキャッシュへ読み込んだとき
+    OnUpdate            *キャッシュをディスクに書き込んだとき
+　　--------------------------------------------------------------------------
+
+　● OnLoad イベント
+　　[定義]　procedure OnLoad: TNotifyEvent;
+　　[説明]　ディスクからキャッシュへと、INIファイルの内容が読み込まれたときに
+　　　　　　発生します。キャッシュに内容が読み込まれるのは、次の場合です。
+　　　　　　　　・Reloadメソッドを実行したとき
+　　　　　　　　・DefaultFolderプロパティを変更したとき
+　　　　　　　　・FileNameプロパティを変更したとき
+
+  ● OnUpdate イベント
+　　[定義]  procedure OnUpdate: TNotifyEvent;
+    [説明]　メモリのキャッシュがディスクに書き込まれたときに発生します。具体的
+　　　　　　には次のときに発生します。
+      　　　　　・Updateメソッドを実行したとき
+      　　　　　・Renameメソッドを実行したとき
+      　　　　　・UpdateAtOnceプロパティがTrueのとき、Write系のメソッドを使用
+　　　　　　　　　した場合と、DeleteItemメソッドを実行した場合。
+
+【12.問題点と今後の予定】
+    今のところ、特にありません。
+
+【13.サポート 】
+　　可能な限りのサポートは行います。
+　　ソフトウェアの感想、意見、バグ報告などはホームページへお願いします。
+　　　flow of water　　http://wblue.hp.infoseek.co.jp/
+
+【14.使用条件 】
+    このプログラムはフリーソフトです。フリーソフト、商用ソフトに関わりなく使用
+　　することができます。ただし、免責事項、及び配布条件に同意できない場合、使用
+　　できません。
+
+【15.免責事項 】
+　　このプログラムを使用したいかなる結果に対しても、作者は免責とします。プログ
+　　ラム、及び付随するファイルをダウンロード開始した時点、あるいは入手した時点
+　　でその者がすべてのリスクを負います。入手中、及び入手することによって発生し
+　　た損害に対して、作者はいっさいの責任を負いません。
+　　また、ご使用される場合、使用者ご自身がすべてのリスクを負います。使用するこ
+　　とによって発生した損害は、その原因の如何に関わらず、作者はいっさいの責任を
+　　負いません。
+
+【16.配布条件 】
+　　このコンポーネントを組み込んだソフトウェアは、有償、無償に関わりなく自由に
+　　配布できます。ただし、コンポーネントのソースファイルを配布する場合、その理
+　　由や配布手段に関係なく、必ず作者の承認を得てください。
+
+【17.変更履歴】
+1.0 - 1.10 省略
+1.11 フォームの位置とサイズ関係のメソッドを調整。
+1.12 ReadForm、ReadFormEx、WriteForm、WriteFormExメソッドの調整。
+2.0  WriteWindow、WriteWinPos、WriteWinSize、WriteFormExメソッドを廃止し、
+　　 WriteFormメソッドに一本化した。
+　　 ReadWindowメソッドを廃止し、ReadFormメソッドに統合。
+　　 ReadCardianl、WriteCardinal、ReadDate、WriteDate、ReadTime、WriteTime、
+　　 ReadSize、ReadPosメソッドの追加。
+　　 Fenceプロパティの廃止。
+　　 WriteForm、WriteListなどで特殊なデータ型を記録した場合、ItemExistsメソッ
+　　 ドでアイテムの存在を確認できなかった不具合を修正。
+　　 WriteForm、WriteListなどで特殊なデータ型を記録した場合、DeleteItemメソッ
+　　 ドでデータを削除できなかった不具合を修正。
+2.1  AutoUpdateプロパティの追加。
+　　 OnLoadイベントの追加。
+2.2  ReadFont、WriteFontメソッドでフォントのPixelsPerInchプロパティは保存/読み
+　　 取りの対象から外した。

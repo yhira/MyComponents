@@ -1,0 +1,17 @@
+:Base EEx.hlp>main
+:Title TEditorEx ver 1.07
+:Index TEditorEx ver 1.07 =EEx.hlp
+1 はじめに =HLP000001
+1 インストール =HLP000002
+1 既知の問題点 =HLP000003
+1 プロパティとメソッド一覧 =HLP000005
+1 TEditorEx
+2 拡張機能 =HLP000009
+2 検索 =HLP000006
+2 置換 =HLP000007
+2 検索と置換以外の機能 =HLP000008
+1 クラス
+2 TEditorExMarks =HLP000011
+2 TVerticalLines =HLP000012
+2 TVerticalLine =HLP000013
+
